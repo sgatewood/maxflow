@@ -103,7 +103,7 @@ def ford_fulkerson(graph,source="S",sink="T"):
     path = get_aug_path(graph,source,sink)
     while path != None:
         flow = min(map(Edge.get_potential,path))
-        print("|".join(map(str,path)),"(flow = %d)" % flow)
+        # print("|".join(map(str,path)),"(flow = %d)" % flow)
 
         for edge in path:
             edge.addFlow(flow)
