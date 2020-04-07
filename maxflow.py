@@ -35,11 +35,11 @@ class Edge:
         self.aug.value -= flow
         self.aug._check_capacity()
 
-# def print_graph(graph):
-#     for key in graph:
-#         # print(key)
-#         for edge in graph[key]:
-#             print(edge)
+def print_graph(graph):
+    for key in graph:
+        # print(key)
+        for edge in graph[key]:
+            print(edge)
 
 def get_data(filename):
     with open(filename) as y:
@@ -71,6 +71,10 @@ def add_aug_paths(graph):
 
         graph.setdefault(dest,[]).append(aug)
 
+def print_path(path):
+    for edge in path:
+        print(edge,end=",")
+    print()
 
 def get_aug_path(graph,src,sink):
     paths = [[edge] for edge in graph[src] if edge.value < edge.capacity]
@@ -87,7 +91,7 @@ def get_aug_path(graph,src,sink):
                 continue
             paths.append(path + [edge])
 
-def ford_fulkerson(graph,src="S",sink="T"):
+def ford_fulkerson(graph,source="S",sink="T"):
     """Mutates graph and returns total flow"""
 
     add_aug_paths(graph)
@@ -96,7 +100,7 @@ def ford_fulkerson(graph,src="S",sink="T"):
 
     total_flow = 0
 
-    path = get_aug_path(graph,src,sink)
+    path = get_aug_path(graph,source,sink)
     while path != None:
         flow = min(map(Edge.get_potential,path))
         print("|".join(map(str,path)),"(flow = %d)" % flow)
@@ -104,7 +108,7 @@ def ford_fulkerson(graph,src="S",sink="T"):
         for edge in path:
             edge.addFlow(flow)
 
-        path = get_aug_path(graph,src,sink)
+        path = get_aug_path(graph,source,sink)
         total_flow += flow
         # input()
 
