@@ -1,9 +1,3 @@
-
-def get_data(filename):
-    with open(filename) as y:
-        for line in y:
-            yield line.strip().split(",")
-
 def red(s):
     return "\033[1;31m%s\033[0m" % s
 
@@ -36,8 +30,9 @@ class Edge:
 
     def addFlow(self,flow):
         self.value += flow
-        self.aug.value -= flow
         self._check_capacity()
+
+        self.aug.value -= flow
         self.aug._check_capacity()
 
 # def print_graph(graph):
@@ -46,53 +41,49 @@ class Edge:
 #         for edge in graph[key]:
 #             print(edge)
 
+def get_data(filename):
+    with open(filename) as y:
+        for line in y:
+            yield line.strip().split(",")
+
 def get_graph(filename):
     graph = {}
     for lst in get_data(filename):
-        src,dest = lst[:2]
-        capacity = 0
-        if len(lst) >= 3:
-            capacity = int(lst[2])
-
-        if src not in graph:
-            graph[src] = []
-
-        if dest not in graph:
-            graph[dest] = []
+        src = lst[0]
+        dest = lst[1]
+        capacity = 1 if len(lst) < 3 else int(lst[2])
 
         edge = Edge(src,dest,capacity)
         aug = Edge(dest,src,capacity,capacity)
+
         Edge.link(edge,aug)
 
-        graph[src].append(edge)
-        graph[dest].append(aug)
+        graph.setdefault(src,[]).append(edge)
+        graph.setdefault(dest,[]).append(aug)
 
     return graph
 
 def get_aug_path(graph,src,sink):
-    paths = []
-    for edge in graph[src]:
-        if edge.value >= edge.capacity:
-            continue
-        paths.append([edge])
-    while len(paths) != 0:
-        # print(len(paths),len(paths[0]),paths[0][-1].src)
+    paths = [[edge] for edge in graph[src] if edge.value < edge.capacity]
+
+    while len(paths) > 0:
         path = paths.pop(0)
         end = path[-1].dest
+
         if end == sink:
             return path
-        found = True
+
         for edge in graph[end]:
             if edge.dest in map(lambda e: e.src,path) or edge.value >= edge.capacity:
                 continue
-            newPath = path + [edge]
-            # if newPath[0] == None or edge.get_potential() < newPath[0]:
-            #     newPath[0] = edge.get_potential()
-            #     print(edge,newPath[0],sep="|||")
-            paths.append(newPath)
+            paths.append(path + [edge])
 
 def ford_fulkerson(graph,src="S",sink="T"):
+    """Mutates graph and returns total flow"""
+
     # print_graph(graph)
+
+    total_flow = 0
 
     path = get_aug_path(graph,src,sink)
     while path != None:
@@ -103,7 +94,11 @@ def ford_fulkerson(graph,src="S",sink="T"):
             edge.addFlow(flow)
 
         path = get_aug_path(graph,src,sink)
+        total_flow += flow
         # input()
 
-graph = get_graph("graph.csv")
-ford_fulkerson(graph)
+    return total_flow
+
+if __name__ == "__main__":
+    graph = get_graph("graph.csv")
+    print(ford_fulkerson(graph))
