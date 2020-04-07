@@ -54,14 +54,23 @@ def get_graph(filename):
         capacity = 1 if len(lst) < 3 else int(lst[2])
 
         edge = Edge(src,dest,capacity)
-        aug = Edge(dest,src,capacity,capacity)
-
-        Edge.link(edge,aug)
 
         graph.setdefault(src,[]).append(edge)
-        graph.setdefault(dest,[]).append(aug)
 
     return graph
+
+def add_aug_paths(graph):
+    edges = []
+    for lst in graph.values():
+        edges.extend(lst)
+
+    for edge in edges:
+        src,dest,capacity = edge.src,edge.dest,edge.capacity
+        aug = Edge(dest,src,capacity,capacity)
+        Edge.link(edge,aug)
+
+        graph.setdefault(dest,[]).append(aug)
+
 
 def get_aug_path(graph,src,sink):
     paths = [[edge] for edge in graph[src] if edge.value < edge.capacity]
@@ -80,6 +89,8 @@ def get_aug_path(graph,src,sink):
 
 def ford_fulkerson(graph,src="S",sink="T"):
     """Mutates graph and returns total flow"""
+
+    add_aug_paths(graph)
 
     # print_graph(graph)
 
