@@ -62,9 +62,10 @@ def get_max_bipartite_matching(graph):
 
     return prizes
 
-graph = get_graph("choices.csv",prize_info_filename="prize_info.csv")
-# maxflow.print_graph(graph)
-# print("-"*20)
+if __name__ == "__main__":
+    graph = get_graph("choices.csv",prize_info_filename="prize_info.csv")
+    # maxflow.print_graph(graph)
+    # print("-"*20)
 
-prizes = get_max_bipartite_matching(graph)
-print(prizes)
+    prizes = get_max_bipartite_matching(graph)
+    print(prizes)
